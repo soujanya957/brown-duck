@@ -1,0 +1,9 @@
+# conda env create -f sim/environment.yml && conda activate brown-duck
+name: brown-duck
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - -r requirements.txt
