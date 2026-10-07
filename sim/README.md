@@ -114,6 +114,14 @@ and didn't fall. It ends with `PASS`.
 - **Duck falls or acts strangely.** Press Space to stop. Very high step frequency (P pressed many
   times) is outside what the policy was trained on.
 
+## Troubleshooting log
+
+Hit a problem that isn't covered above? Add a row (via pull request) once you've fixed it.
+
+| OS | Python | Problem / error message | Fix | Who |
+|---|---|---|---|---|
+| | | | | |
+
 ## What's in this folder
 
 | Path | What it is |
