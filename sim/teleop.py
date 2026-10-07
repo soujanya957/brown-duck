@@ -30,6 +30,20 @@ HERE = Path(__file__).resolve().parent
 
 USE_MOTOR_SPEED_LIMITS = True
 
+
+def load_model(scene_path):
+    """Load a scene XML. Falls back to an in-memory asset dict (like upstream's
+    base.get_assets()) for scenes whose file paths only resolve that way, e.g. the
+    rough-terrain scene's heightfield texture."""
+    scene_path = Path(scene_path)
+    try:
+        return mujoco.MjModel.from_xml_path(str(scene_path))
+    except ValueError:
+        folder = scene_path.parent
+        assets = {f.name: f.read_bytes() for f in folder.glob("*.xml")}
+        assets.update({f.name: f.read_bytes() for f in (folder / "assets").glob("*") if f.is_file()})
+        return mujoco.MjModel.from_xml_string(scene_path.read_text(), assets=assets)
+
 # Joint order the policy was trained with. Checked at startup.
 EXPECTED_ACTUATORS = [
     "left_hip_yaw",
@@ -52,7 +66,7 @@ EXPECTED_ACTUATORS = [
 class MJInferBase:
     def __init__(self, model_path):
 
-        self.model = mujoco.MjModel.from_xml_path(str(model_path))
+        self.model = load_model(model_path)
         print(model_path)
 
         self.sim_dt = 0.002
