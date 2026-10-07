@@ -18,7 +18,8 @@ Pick **one** setup: conda (any OS) or a plain venv (per-OS steps below).
 
 ## Option A: conda (macOS, Linux, Windows)
 
-If you have [Miniconda](https://docs.anaconda.com/miniconda/) or Anaconda:
+If you have [Miniconda](https://docs.anaconda.com/miniconda/) or Anaconda (check with `conda --version`).
+No conda yet? Follow **[INSTALL_CONDA.md](INSTALL_CONDA.md)** first, or use Option B.
 
 ```bash
 conda env create -f sim/environment.yml
@@ -133,6 +134,7 @@ Hit a problem that isn't covered above? Add a row (via pull request) once you've
 | `data/polynomial_coefficients.pkl` | reference gait; sets the step period |
 | `onnx_infer.py`, `poly_reference_motion_numpy.py` | small helpers from upstream |
 | `requirements.txt` / `environment.yml` | pip deps / conda env (`brown-duck`, Python 3.12) |
+| `INSTALL_CONDA.md` | first-time conda (or Python) install, per OS |
 | `CREDITS.md` | upstream sources and license notes |
 
 Don't edit `model/`, actuator parameters or the policy: the policy only works with this exact

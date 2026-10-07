@@ -8,10 +8,24 @@ Goal: a stock v2 **walking by early December**, then our own design.
 
 ![The duck walking in the MuJoCo simulator](docs/images/sim-walking.gif)
 
-Install the simulator (macOS, Windows or Linux; conda or venv) and drive the duck with the keyboard.
-No GPU needed. **→ [sim/README.md](sim/README.md)**
+### 1. Get the code
 
-Quick start with conda, from this folder:
+You need [git](https://git-scm.com/downloads) (`git --version` to check; on macOS running it the
+first time offers to install it, on Windows use `winget install -e --id Git.Git`). Then:
+
+```bash
+git clone --recursive https://github.com/soujanya957/brown-duck.git
+cd brown-duck
+```
+
+`--recursive` also pulls the `Open_Duck_Mini/` hardware submodule. If you already cloned without it,
+run `git submodule update --init`. The sim itself doesn't need the submodule.
+
+Already cloned? Get the latest with `git pull && git submodule update --init`.
+
+### 2. Install and run the simulator
+
+No GPU needed; works on macOS, Windows and Linux. With conda, from the `brown-duck/` folder:
 
 ```bash
 conda env create -f sim/environment.yml && conda activate brown-duck
@@ -21,6 +35,10 @@ python sim/teleop.py        # Linux / Windows
 
 W/S walk, A/D turn, Space stop, H switches to head control.
 
+- **No conda?** Install it with **[sim/INSTALL_CONDA.md](sim/INSTALL_CONDA.md)**, or use a plain
+  [venv](sim/README.md#option-b-venv) instead.
+- Full per-OS steps, controls and troubleshooting: **[sim/README.md](sim/README.md)**
+
 ## Today's meeting
 
 Split into a **hardware** group and a **software** group, then an open-ended build block:
@@ -28,15 +46,6 @@ Split into a **hardware** group and a **software** group, then an open-ended bui
 - Hardware group: [`activities/hardware.md`](activities/hardware.md)
 - Software group: [`activities/software.md`](activities/software.md)
 - Last block, build something you want: [`activities/open-ended.md`](activities/open-ended.md)
-
-## Getting the code
-
-```bash
-git clone --recursive https://github.com/soujanya957/brown-duck.git
-```
-
-`--recursive` also pulls `Open_Duck_Mini/`. If you already cloned without it, run
-`git submodule update --init`. The sim itself doesn't need the submodule.
 
 ## Folder map
 
