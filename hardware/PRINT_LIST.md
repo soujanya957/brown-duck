@@ -4,7 +4,7 @@ Checklist of every part to 3D print for one Open Duck Mini v2, from
 [`Open_Duck_Mini/docs/print_guide.md`](../Open_Duck_Mini/docs/print_guide.md). The STLs live in
 [`Open_Duck_Mini/print/`](../Open_Duck_Mini/print/) (our fork, as a submodule); we link to them instead of copying them here.
 Links below work in a local clone (`git clone --recursive`). On github.com, browse them at
-[soujanya957/Open_Duck_Mini/print](https://github.com/soujanya957/Open_Duck_Mini/tree/main/print).
+[soujanya957/Open_Duck_Mini/print](https://github.com/soujanya957/Open_Duck_Mini/tree/v2/print).
 
 ## Settings
 
