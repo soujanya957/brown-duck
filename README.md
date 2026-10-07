@@ -6,6 +6,8 @@ Goal: a stock v2 **walking by early December**, then our own design.
 
 ## Today's goal: drive the duck in simulation
 
+![The duck walking in the MuJoCo simulator](docs/images/sim-walking.gif)
+
 Install the simulator (macOS, Windows or Linux; conda or venv) and drive the duck with the keyboard.
 No GPU needed. **→ [sim/README.md](sim/README.md)**
 
@@ -30,6 +32,7 @@ git clone --recursive https://github.com/soujanya957/brown-duck.git
 
 ## Folder map
 
+- **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
 - **`sim/`**: our jax-free simulator + keyboard teleop (`teleop.py`, `model/`, `policies/`)
 - **`Open_Duck_Mini/`** (git submodule, our fork of upstream): the hardware hub
   - `README.md`: CAD, bill of materials, build-guide links

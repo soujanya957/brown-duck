@@ -5,6 +5,15 @@ Needs only `mujoco`, `onnxruntime` and `numpy`: no GPU, CUDA or training framewo
 
 **Python:** 3.10 to 3.14 all work (pip picks matching wheels). **3.12 is recommended.** Run every command from the repo root (`brown-duck/`).
 
+![The duck walking in the MuJoCo simulator](../docs/images/sim-walking.gif)
+
+| Standing | Walking (W) | Turning (A) | Head mode (H, then ←) |
+|---|---|---|---|
+| ![standing](../docs/images/sim-standing.png) | ![walking](../docs/images/sim-walking-side.png) | ![turning](../docs/images/sim-turning.png) | ![head yaw](../docs/images/sim-head-yaw.png) |
+
+The pictures are rendered offscreen from the same scene, so the real viewer window looks like this,
+plus whatever camera angle you pick with the mouse.
+
 Pick **one** setup: conda (any OS) or a plain venv (per-OS steps below).
 
 ## Option A: conda (macOS, Linux, Windows)
