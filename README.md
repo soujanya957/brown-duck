@@ -21,6 +21,14 @@ python sim/teleop.py        # Linux / Windows
 
 W/S walk, A/D turn, Space stop, H switches to head control.
 
+## Today's meeting
+
+Split into a **hardware** group and a **software** group, then an open-ended build block:
+
+- Hardware group: [`activities/hardware.md`](activities/hardware.md)
+- Software group: [`activities/software.md`](activities/software.md)
+- Last block, build something you want: [`activities/open-ended.md`](activities/open-ended.md)
+
 ## Getting the code
 
 ```bash
@@ -32,6 +40,12 @@ git clone --recursive https://github.com/soujanya957/brown-duck.git
 
 ## Folder map
 
+- **`hardware/`**: what to buy and build
+  - `BOM.md` / `BOM.csv`: parts list with prices (edit the CSV, regenerate with `make_bom_md.py`)
+  - `PRINT_LIST.md`: checklist of all 36 STLs to print, linked into `Open_Duck_Mini/print/`
+  - `ASSEMBLY.md`: one-page build order, rules, servo IDs, wiring pins
+- **`activities/`**: meeting worksheets (`hardware.md`, `software.md`, `open-ended.md`);
+  your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
 - **`sim/`**: our jax-free simulator + keyboard teleop (`teleop.py`, `model/`, `policies/`)
 - **`Open_Duck_Mini/`** (git submodule, our fork of upstream): the hardware hub
