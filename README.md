@@ -38,17 +38,20 @@ cables. Use `python -m serial.tools.list_ports` to find the board port (for exam
 
 **Only one servo may be connected while changing an ID.** New servos often share ID 1. With the
 first servo connected and powered, check its current ID, then assign 1 if needed. Disconnect
-power, swap in the second servo, and assign it ID 2. Try `OLD=1` for a new servo; replace it with its current ID if it was configured before:
+power, swap in the second servo, and assign it ID 2. This example assumes the second servo
+currently has ID 1:
 
 ```bash
-python sim/servo_lab.py status --port PORT --ids OLD
-python sim/servo_lab.py set-id --port PORT --old-id OLD --new-id 2
+python sim/servo_lab.py status --port PORT --ids 1
+python sim/servo_lab.py set-id --port PORT --old-id 1 --new-id 2
 python sim/servo_lab.py status --port PORT --ids 2
 ```
 
 For the first servo, change `--new-id 2` to `--new-id 1` if its current ID is not 1.
-If it is already ID 1, leave it alone. For the second, `OLD` is usually 1. Power
-cycle after the ID change. Label the servos **1** and **2**. With just one connected, try a small
+If it is already ID 1, leave it alone. If the second servo has another ID, replace `1` in
+`--ids 1` and `--old-id 1` with that number. Replace `PORT` with the actual serial port; these
+words are not shell variables. Power cycle after the ID change. Label the servos **1** and
+**2**. With just one connected, try a small
 position command (degrees relative to the servo's factory center):
 
 ```bash
