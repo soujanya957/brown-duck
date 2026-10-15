@@ -148,3 +148,10 @@ For this week's group activity, see the [root README](../README.md#todays-meetin
 `servo_lab.py demo` opens a small two-joint MuJoCo scene. Arrow keys move its two joints in
 5° steps. Add `--port PORT --ids 1 2` to send the same relative moves to two connected STS3215
 servos. The lab uses this same conda environment and Feetech's Python SDK.
+
+## Legs-only model
+
+From the repo root, run `mjpython sim/legs.py` on macOS or `python sim/legs.py` on Linux/Windows.
+This viewer keeps the original two leg assemblies and their ten joints, with the body and head
+hidden and the hips anchored. It bends the knees slowly to show the linkage. Add
+`--preview docs/images/legs-only.png` to save a still instead of opening the viewer.

@@ -85,6 +85,38 @@ and which command sets a target? What happens to the sim when a hardware command
 
 The full walking duck sim is still available: [sim/README.md](sim/README.md).
 
+### 5. Minimal prints for one leg
+
+For a first **left leg mechanism** (hip, shin and foot), print these parts from
+[`Open_Duck_Mini/print/`](Open_Duck_Mini/print/). This is **14 printed pieces**, plus the servos,
+horns, screws and bearings needed for assembly. The [full print list](hardware/PRINT_LIST.md)
+covers the complete duck.
+
+| Piece | Qty |
+|---|---:|
+| [`roll_motor_top.stl`](Open_Duck_Mini/print/roll_motor_top.stl), [`roll_motor_bottom.stl`](Open_Duck_Mini/print/roll_motor_bottom.stl) | 1 each |
+| [`left_roll_to_pitch.stl`](Open_Duck_Mini/print/left_roll_to_pitch.stl), [`left_cache.stl`](Open_Duck_Mini/print/left_cache.stl) | 1 each |
+| [`knee_to_ankle_left_sheet.stl`](Open_Duck_Mini/print/knee_to_ankle_left_sheet.stl), [`knee_to_ankle_right_sheet.stl`](Open_Duck_Mini/print/knee_to_ankle_right_sheet.stl), [`leg_spacer.stl`](Open_Duck_Mini/print/leg_spacer.stl) | 2 each |
+| [`foot_top.stl`](Open_Duck_Mini/print/foot_top.stl), [`foot_side.stl`](Open_Duck_Mini/print/foot_side.stl), [`foot_bottom_pla.stl`](Open_Duck_Mini/print/foot_bottom_pla.stl), [`foot_bottom_tpu.stl`](Open_Duck_Mini/print/foot_bottom_tpu.stl) | 1 each |
+
+PLA at 15% infill for the rigid pieces; TPU at 40% for `foot_bottom_tpu.stl`. The
+[assembly guide](Open_Duck_Mini/docs/assembly_guide.md) shows the foot, shin, thigh and hip order.
+
+### 6. View only the sim legs
+
+This command opens the **two legs from the duck model** with the trunk and head hidden. The hips
+are fixed in place while the knees bend slowly, so it is a mechanism viewer rather than a walking
+simulation. Run from the same `brown-duck` conda environment:
+
+```bash
+mjpython sim/legs.py  # macOS
+python sim/legs.py    # Linux / Windows
+```
+
+![Two articulated Open Duck Mini legs in MuJoCo](docs/images/legs-only.png)
+
+To save a new still: `python sim/legs.py --preview docs/images/legs-only.png`.
+
 ## Folder map
 
 - **`hardware/`**: what to buy and build
