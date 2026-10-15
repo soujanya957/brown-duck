@@ -57,7 +57,14 @@ python sim/servo_lab.py status --port PORT --ids 2
 ```
 
 Remove any horn or load before commanding a position: a servo can move to its factory center.
-The demo limits angle commands to ±30°. Do not force a powered servo by hand.
+For a first motion test, `sweep` moves only ±10° from the **current** position and returns:
+
+```bash
+python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40
+```
+
+The demo limits angle commands to ±30°. Do not force a powered servo by hand. A servo that
+reports an input-voltage error must have its power issue corrected before a sweep.
 
 The STS3215 **1:147, 1:191 and 1:345** variants all use the same 4096-tick output position scale,
 so the requested angle does **not** get multiplied by the gear ratio. The ratio changes the
@@ -105,6 +112,7 @@ positions when the viewer opens. Keep both motors free to turn.
 **Try to explain:** Why must IDs differ on one bus? Which values in `status` are measurements,
 and which command sets a target? What happens to the sim when a hardware command fails?
 
+For a step-by-step mixed-ratio setup, use the [servo daisy-chain guide](hardware/SERVO_DAISY_CHAIN.md).
 The full walking duck sim is still available: [sim/README.md](sim/README.md).
 
 ### 5. Minimal prints for one leg
@@ -145,6 +153,7 @@ To save a new still: `python sim/legs.py --preview docs/images/legs-only.png`.
   - `BOM.md` / `BOM.csv`: parts list with prices (edit the CSV, regenerate with `make_bom_md.py`)
   - `PRINT_LIST.md`: checklist of all 36 STLs to print, linked into `Open_Duck_Mini/print/`
   - `ASSEMBLY.md`: one-page build order, rules, servo IDs, wiring pins
+  - `SERVO_DAISY_CHAIN.md`: wiring and commands for mixed-ratio STS3215 servos
 - **`activities/`**: meeting worksheets (`hardware.md`, `software.md`, `open-ended.md`);
   your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)

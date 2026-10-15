@@ -160,3 +160,7 @@ From the repo root, run `mjpython sim/legs.py` on macOS or `python sim/legs.py` 
 This viewer keeps the original two leg assemblies and their ten joints, with the body and head
 hidden and the hips anchored. It bends the knees slowly to show the linkage. Add
 `--preview docs/images/legs-only.png` to save a still instead of opening the viewer.
+
+To make one small hardware sweep from the live position, run
+`python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40`.
+The command reads the current position first and refuses to move if the servo reports an error.
