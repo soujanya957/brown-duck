@@ -141,3 +141,10 @@ Don't edit `model/`, actuator parameters or the policy: the policy only works wi
 robot model and joint order.
 
 See [CREDITS.md](CREDITS.md) for where these files come from.
+
+## Two-servo lab
+
+For this week's group activity, see the [root README](../README.md#todays-meeting-servo-lab).
+`servo_lab.py demo` opens a small two-joint MuJoCo scene. Arrow keys move its two joints in
+5° steps. Add `--port PORT --ids 1 2` to send the same relative moves to two connected STS3215
+servos. The lab uses this same conda environment and Feetech's Python SDK.

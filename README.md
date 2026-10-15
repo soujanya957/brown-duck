@@ -4,48 +4,86 @@ Our club's build of the [Open Duck Mini v2](https://github.com/apirrone/Open_Duc
 bipedal duck robot with 14 Feetech STS3215 servos, a Raspberry Pi Zero 2W and a BNO055 IMU.
 Goal: a stock v2 **walking by early December**, then our own design.
 
-## Today's goal: drive the duck in simulation
+## Today's meeting: servo lab
 
-![The duck walking in the MuJoCo simulator](docs/images/sim-walking.gif)
+Work in **3–4 groups**. Each group gets **two Feetech STS3215 servos, one Waveshare bus servo
+adapter, a suitable servo power supply, and a USB cable**. Bring a laptop with this repo and the
+`brown-duck` conda environment. The goal is to give each servo a unique ID, read its status,
+command a small angle, then connect both on one bus. After that, try the two-servo simulation and
+mirror it to the real servos.
 
-### 1. Get the code
-
-You need [git](https://git-scm.com/downloads) (`git --version` to check; on macOS running it the
-first time offers to install it, on Windows use `winget install -e --id Git.Git`). Then:
+### 1. Get ready
 
 ```bash
 git clone --recursive https://github.com/soujanya957/brown-duck.git
 cd brown-duck
+conda env create -f sim/environment.yml
+conda activate brown-duck
 ```
 
-`--recursive` also pulls the `Open_Duck_Mini/` hardware submodule. If you already cloned without it,
-run `git submodule update --init`. The sim itself doesn't need the submodule.
+Already cloned? Run `git pull && git submodule update --init`, then
+`conda env update -f sim/environment.yml --prune` and `conda activate brown-duck`.
+No conda yet? Follow [sim/INSTALL_CONDA.md](sim/INSTALL_CONDA.md), or the
+[venv instructions](sim/README.md#option-b-venv). Run all commands below from `brown-duck/`.
 
-Already cloned? Get the latest with `git pull && git submodule update --init`.
+### 2. Wire and find the port
 
-### 2. Install and run the simulator
+Power **off** while plugging servos in. Connect the power supply to the adapter's servo power
+input with the correct polarity and voltage for your exact STS3215 variant; USB alone does not
+power the servos. Connect USB to the laptop. Keep the servo horns clear of fingers and loose
+cables. Use `python -m serial.tools.list_ports` to find the board port (for example
+`/dev/tty.usbmodem...`, `/dev/ttyUSB0`, or `COM3`). Replace `PORT` below with your actual port.
 
-No GPU needed; works on macOS, Windows and Linux. With conda, from the `brown-duck/` folder:
+### 3. One servo at a time: ID, status, angle
+
+**Only one servo may be connected while changing an ID.** New servos often share ID 1. With the
+first servo connected and powered, check its current ID, then assign 1 if needed. Disconnect
+power, swap in the second servo, and assign it ID 2. Try `OLD=1` for a new servo; replace it with its current ID if it was configured before:
 
 ```bash
-conda env create -f sim/environment.yml && conda activate brown-duck
-mjpython sim/teleop.py      # macOS
-python sim/teleop.py        # Linux / Windows
+python sim/servo_lab.py status --port PORT --ids OLD
+python sim/servo_lab.py set-id --port PORT --old-id OLD --new-id 2
+python sim/servo_lab.py status --port PORT --ids 2
 ```
 
-W/S walk, A/D turn, Space stop, H switches to head control.
+For the first servo, change `--new-id 2` to `--new-id 1` if its current ID is not 1.
+If it is already ID 1, leave it alone. For the second, `OLD` is usually 1. Power
+cycle after the ID change. Label the servos **1** and **2**. With just one connected, try a small
+position command (degrees relative to the servo's factory center):
 
-- **No conda?** Install it with **[sim/INSTALL_CONDA.md](sim/INSTALL_CONDA.md)**, or use a plain
-  [venv](sim/README.md#option-b-venv) instead.
-- Full per-OS steps, controls and troubleshooting: **[sim/README.md](sim/README.md)**
+```bash
+python sim/servo_lab.py angle --port PORT --id 2 --degrees 10
+python sim/servo_lab.py status --port PORT --ids 2
+```
 
-## Today's meeting
+Remove any horn or load before commanding a position: a servo can move to its factory center.
+The demo limits angle commands to ±30°. Do not force a powered servo by hand.
 
-Split into a **hardware** group and a **software** group, then an open-ended build block:
+### 4. Daisy chain and compare sim with hardware
 
-- Hardware group: [`activities/hardware.md`](activities/hardware.md)
-- Software group: [`activities/software.md`](activities/software.md)
-- Last block, build something you want: [`activities/open-ended.md`](activities/open-ended.md)
+Power off, connect both servos on the same bus with their separate IDs, then power on:
+
+```bash
+python sim/servo_lab.py status --port PORT --ids 1 2
+```
+
+First run the two-servo simulation alone. On macOS use `mjpython`; on Linux and Windows use
+`python` (Windows path: `sim\servo_lab.py`):
+
+```bash
+mjpython sim/servo_lab.py demo                  # macOS, sim only
+mjpython sim/servo_lab.py demo --port PORT --ids 1 2  # macOS, sim + hardware
+```
+
+On Linux/Windows, replace `mjpython` with `python`. Click the viewer, then use **←/→** for servo
+1 and **↑/↓** for servo 2. Each press changes its target by 5°, up to ±30°. In hardware mode,
+those same relative commands go to the two physical servos, starting from their measured
+positions when the viewer opens. Keep both motors free to turn.
+
+**Try to explain:** Why must IDs differ on one bus? Which values in `status` are measurements,
+and which command sets a target? What happens to the sim when a hardware command fails?
+
+The full walking duck sim is still available: [sim/README.md](sim/README.md).
 
 ## Folder map
 
@@ -56,7 +94,7 @@ Split into a **hardware** group and a **software** group, then an open-ended bui
 - **`activities/`**: meeting worksheets (`hardware.md`, `software.md`, `open-ended.md`);
   your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
-- **`sim/`**: our jax-free simulator + keyboard teleop (`teleop.py`, `model/`, `policies/`)
+- **`sim/`**: walking simulator and the two-servo lab (`teleop.py`, `servo_lab.py`)
 - **`Open_Duck_Mini/`** (git submodule, our fork of upstream): the hardware hub
   - `README.md`: CAD, bill of materials, build-guide links
   - `docs/print_guide.md`: what to 3D print and how
@@ -70,8 +108,8 @@ Split into a **hardware** group and a **software** group, then an open-ended bui
 
 | When | What |
 |---|---|
-| This week | everyone runs the sim; order parts; start 3D printing |
-| Next week | servos arrive: set IDs, build the first leg |
+| This week | servo lab: IDs, status, angles, daisy chain, sim + hardware |
+| Next week | configure the robot IDs and start the first leg |
 | Then | second leg, head, wiring |
 | After that | walking on hardware |
 | Early December | demo |
