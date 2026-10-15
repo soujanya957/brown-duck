@@ -154,13 +154,16 @@ def sweep(bus, motor_id, amplitude, speed, pause):
     if not (0 <= origin - offset and origin + offset <= 4095):
         raise ValueError("Sweep would exceed the servo position range")
     print(f"ID {motor_id}: start {origin} ticks; sweep ±{amplitude:g}° ({offset} ticks), speed {speed}")
-    try:
-        for target in (origin + offset, origin, origin - offset, origin):
+    for target in (origin + offset, origin, origin - offset, origin):
+        try:
             bus.move(motor_id, target, speed)
-            print(f"  commanded {target} ticks")
-            time.sleep(pause)
-    finally:
-        bus.move(motor_id, origin, speed)
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f"Sweep stopped: {exc}. The command may have reached the servo; "
+                "check its actual position before another move."
+            ) from exc
+        print(f"  commanded {target} ticks")
+        time.sleep(pause)
     print(f"ID {motor_id}: returned to {origin} ticks")
 
 
