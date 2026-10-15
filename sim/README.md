@@ -149,6 +149,11 @@ For this week's group activity, see the [root README](../README.md#todays-meetin
 5° steps. Add `--port PORT --ids 1 2` to send the same relative moves to two connected STS3215
 servos. The lab uses this same conda environment and Feetech's Python SDK.
 
+STS3215 1:147, 1:191 and 1:345 variants keep the same degree-to-tick mapping. Use
+`--gear-ratios 147 345` with `demo` or `status` to label two different motors, and
+`--speeds 40 60` with `demo` to set their command speeds separately. For a single `angle`
+command, use `--gear-ratio 147 --speed 40`. The ratio flags do not rescale positions.
+
 ## Legs-only model
 
 From the repo root, run `mjpython sim/legs.py` on macOS or `python sim/legs.py` on Linux/Windows.

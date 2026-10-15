@@ -59,6 +59,21 @@ python sim/servo_lab.py status --port PORT --ids 2
 Remove any horn or load before commanding a position: a servo can move to its factory center.
 The demo limits angle commands to ±30°. Do not force a powered servo by hand.
 
+The STS3215 **1:147, 1:191 and 1:345** variants all use the same 4096-tick output position scale,
+so the requested angle does **not** get multiplied by the gear ratio. The ratio changes the
+mechanical speed and torque. To label what is on the bus and choose a slower command speed:
+
+```bash
+python sim/servo_lab.py status --port PORT --ids 1 2 --gear-ratios 147 345
+python sim/servo_lab.py angle --port PORT --id 1 --degrees 10 --gear-ratio 147 --speed 40
+```
+
+`--gear-ratio`/`--gear-ratios` label the motors in the output; `--speed` sets the servo's motion
+speed (default 60, allowed 1–200). The usual STS3215 labels are **C046 = 1:147**,
+**C044 = 1:191**, and **C001 = 1:345**. Some high-torque units, such as **C018/C047**, are
+**12 V** versions. Read the voltage on each actual label: **do not daisy-chain 7.4 V and 12 V
+servos on one powered bus**. Give the 12 V motor its own suitable board/power supply for this lab.
+
 ### 4. Daisy chain and compare sim with hardware
 
 Power off, connect both servos on the same bus with their separate IDs, then power on:
@@ -73,6 +88,13 @@ First run the two-servo simulation alone. On macOS use `mjpython`; on Linux and 
 ```bash
 mjpython sim/servo_lab.py demo                  # macOS, sim only
 mjpython sim/servo_lab.py demo --port PORT --ids 1 2  # macOS, sim + hardware
+```
+
+For mixed ratios, add `--gear-ratios 147 191` (in the same order as `--ids 1 2`). You can
+also set separate motion speeds with `--speeds 40 60`:
+
+```bash
+mjpython sim/servo_lab.py demo --port PORT --ids 1 2 --gear-ratios 147 191 --speeds 40 60
 ```
 
 On Linux/Windows, replace `mjpython` with `python`. Click the viewer, then use **←/→** for servo
