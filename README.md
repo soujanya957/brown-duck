@@ -13,7 +13,9 @@ The goal is to give each servo a unique ID, read its status, command a small ang
 both on one bus. After that, try the two-servo simulation and mirror it to the real servos.
 
 These are the **12 V, 1:345** high-torque STS3215 units (label **C018** or **C047**). Check that
-both labels say **12 V** before powering anything. The lab only uses these motors.
+both labels say **12 V** before powering anything. The lab only uses these motors. For other gear
+ratios (1:147, 1:191, 7.4 V 1:345) and their power rules, see
+[hardware/SERVO_VARIANTS.md](hardware/SERVO_VARIANTS.md).
 
 ### 1. Get ready
 
@@ -138,6 +140,7 @@ To save a new still: `python sim/legs.py --preview docs/images/legs-only.png`.
   - `PRINT_LIST.md`: checklist of all 36 STLs to print, linked into `Open_Duck_Mini/print/`
   - `ASSEMBLY.md`: one-page build order, rules, servo IDs, wiring pins
   - `SERVO_DAISY_CHAIN.md`: wiring and commands for mixed-ratio STS3215 servos
+  - `SERVO_VARIANTS.md`: other STS3215 gear ratios and power requirements
 - **`activities/`**: meeting worksheets (`hardware.md`, `software.md`, `open-ended.md`);
   your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
