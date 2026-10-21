@@ -113,9 +113,15 @@ python sim/servo_lab.py status --port PORT --ids 2
 factory center):
 
 ```bash
-python sim/servo_lab.py angle --port PORT --id 2 --degrees 10 --speed 40
+python sim/servo_lab.py angle --port PORT --id 2 --degrees 10 --speed 40   # +10° one way
+python sim/servo_lab.py angle --port PORT --id 2 --degrees -10 --speed 40  # -10° the other way
+python sim/servo_lab.py angle --port PORT --id 2 --degrees 0 --speed 40    # back to center
 python sim/servo_lab.py status --port PORT --ids 2
 ```
+
+`--degrees` is an absolute target measured from center (any value from -30 to 30), not a step:
+running `--degrees 10` twice does not move it a second time. Use a negative number to go the
+other direction.
 
 Remove any horn or load before commanding a position: a servo can move to its factory center.
 For a first motion test, `sweep` moves only ±10° from the **current** position and returns:
