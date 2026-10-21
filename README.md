@@ -4,6 +4,14 @@ Our club's build of the [Open Duck Mini v2](https://github.com/apirrone/Open_Duc
 bipedal duck robot with 14 Feetech STS3215 servos, a Raspberry Pi Zero 2W and a BNO055 IMU.
 Goal: a stock v2 **walking by early December**, then our own design.
 
+## Join the robotics club e-board
+
+Interested in an e-board position? Fill out the
+[e-board application form](https://docs.google.com/forms/d/e/1FAIpQLSfT_RuMOdUsZTs073NgPWlHB3cXlm2mz7AZDz0dPcLtar_VOw/viewform)
+or scan the QR code:
+
+<img src="docs/images/eboard-form-qr.png" alt="QR code for the robotics club e-board form" width="200">
+
 ## Today's meeting: servo lab
 
 Work in **3–4 groups**. Each group gets **two high-torque Feetech STS3215 servos** (the ones with
