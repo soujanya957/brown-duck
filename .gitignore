@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .DS_Store
 mujoco_saved_obs.pkl
+*.egg-info/

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brown-duck"
+version = "0.1.0"
+description = "Servo tools for the brown-duck Open Duck Mini build"
+requires-python = ">=3.10"
+dependencies = ["ftservo-python-sdk>=2,<3", "pyserial", "mujoco", "numpy"]
+
+[project.scripts]
+brown-duck-find-port = "duck_tools:find_port"
+brown-duck-setup-motors = "duck_tools:setup_motors"
+brown-duck-calibrate = "duck_tools:calibrate"
+brown-duck-teleoperate = "duck_tools:teleoperate"
+brown-duck-servo = "duck_tools:servo"
+
+[tool.setuptools]
+package-dir = {"" = "sim"}
+py-modules = ["servo_lab", "duck_tools"]

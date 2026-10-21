@@ -31,6 +31,21 @@ Already cloned? Run `git pull && git submodule update --init`, then
 No conda yet? Follow [sim/INSTALL_CONDA.md](sim/INSTALL_CONDA.md), or the
 [venv instructions](sim/README.md#option-b-venv). Run all commands below from `brown-duck/`.
 
+**Optional: LeRobot-style commands.** Run `pip install -e .` once (in the `brown-duck`
+environment) to get these shortcuts, modeled on `lerobot-find-port`, `lerobot-setup-motors`, etc.:
+
+| Command | Does | LeRobot equivalent |
+|---|---|---|
+| `brown-duck-find-port` | unplug/replug the adapter's USB to find its port | `lerobot-find-port` |
+| `brown-duck-setup-motors --port PORT` | prompts for one servo at a time, finds it, sets its ID, centers it | `lerobot-setup-motors` |
+| `brown-duck-calibrate --port PORT` | torque off; record each joint's middle and range to `calibration/lab.json` | `lerobot-calibrate` |
+| `brown-duck-teleoperate --port PORT --ids 1 2` | arrow-key MuJoCo viewer mirrored to two servos (`mjpython $(which brown-duck-teleoperate) ...` on macOS) | `lerobot-teleoperate` |
+| `brown-duck-servo scan/status/set-id/angle/sweep ...` | same as `python sim/servo_lab.py ...` | — |
+
+`setup-motors` and `calibrate` default to `--robot lab` (IDs 1 and 2). Use `--robot left-leg`,
+`right-leg`, `head`, or `duck` for the real joint IDs in [hardware/ASSEMBLY.md](hardware/ASSEMBLY.md).
+Without installing, use `python sim/duck_tools.py find-port` (or `setup-motors`, `calibrate`, ...).
+
 ### 2. Wire and find the port
 
 Power **off** while plugging servos in. Connect the **12 V** supply to the adapter's servo power
@@ -38,7 +53,8 @@ input with the correct polarity; USB alone does not power the servos. Plug **one
 adapter and connect the adapter's USB cable to the laptop. Keep the servo horns clear of fingers
 and loose cables.
 
-**Find the port.** With the conda environment active, list serial ports, unplug the adapter's
+**Find the port.** Run `brown-duck-find-port` (or `python sim/duck_tools.py find-port`) and follow
+the prompt. To do it by hand: with the conda environment active, list serial ports, unplug the adapter's
 USB cable, and list them again. The entry that disappeared is your adapter:
 
 ```bash
@@ -62,6 +78,7 @@ In every command below, replace `PORT` with that name, for example
 
 Every servo on a bus needs its **own ID**. New servos usually come set to ID 1, so two new servos
 on one bus would collide. Set the IDs **with only one servo connected**.
+`brown-duck-setup-motors --port PORT` walks through the steps below for you; here they are by hand.
 
 **Servo 1.** With just the first servo plugged in and powered, find its current ID:
 
@@ -180,7 +197,8 @@ To save a new still: `python sim/legs.py --preview docs/images/legs-only.png`.
 - **`activities/`**: meeting worksheets (`hardware.md`, `software.md`, `open-ended.md`);
   your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
-- **`sim/`**: walking simulator and the two-servo lab (`teleop.py`, `servo_lab.py`)
+- **`sim/`**: walking simulator, the two-servo lab (`teleop.py`, `servo_lab.py`), and the
+  `brown-duck-*` commands (`duck_tools.py`, installed by `pip install -e .`)
 - **`Open_Duck_Mini/`** (git submodule, our fork of upstream): the hardware hub
   - `README.md`: CAD, bill of materials, build-guide links
   - `docs/print_guide.md`: what to 3D print and how

@@ -74,6 +74,7 @@ class Bus:
                 print(f"Found ID {motor_id} (model {model})")
         if not found:
             print(f"No servo answered on IDs {first}–{last}. Check power, cable and port.")
+        return found
 
     def move(self, motor_id, ticks, speed=DEFAULT_SPEED):
         if not 0 <= ticks <= 4095:
