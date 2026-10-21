@@ -6,11 +6,14 @@ Goal: a stock v2 **walking by early December**, then our own design.
 
 ## Today's meeting: servo lab
 
-Work in **3–4 groups**. Each group gets **two Feetech STS3215 servos, one Waveshare bus servo
-adapter, a suitable servo power supply, and a USB cable**. Bring a laptop with this repo and the
-`brown-duck` conda environment. The goal is to give each servo a unique ID, read its status,
-command a small angle, then connect both on one bus. After that, try the two-servo simulation and
-mirror it to the real servos.
+Work in **3–4 groups**. Each group gets **two high-torque Feetech STS3215 servos** (the ones with
+the **square-wave mark** on the label), **one Waveshare bus servo adapter, a 12 V servo power
+supply, and a USB cable**. Bring a laptop with this repo and the `brown-duck` conda environment.
+The goal is to give each servo a unique ID, read its status, command a small angle, then connect
+both on one bus. After that, try the two-servo simulation and mirror it to the real servos.
+
+These are the **12 V, 1:345** high-torque STS3215 units (label **C018** or **C047**). Check that
+both labels say **12 V** before powering anything. The lab only uses these motors.
 
 ### 1. Get ready
 
@@ -28,11 +31,11 @@ No conda yet? Follow [sim/INSTALL_CONDA.md](sim/INSTALL_CONDA.md), or the
 
 ### 2. Wire and find the port
 
-Power **off** while plugging servos in. Connect the power supply to the adapter's servo power
-input with the correct polarity and voltage for your exact STS3215 variant; USB alone does not
-power the servos. Connect USB to the laptop. Keep the servo horns clear of fingers and loose
-cables. Use `python -m serial.tools.list_ports` to find the board port (for example
-`/dev/tty.usbmodem...`, `/dev/ttyUSB0`, or `COM3`). Replace `PORT` below with your actual port.
+Power **off** while plugging servos in. Connect the **12 V** supply to the adapter's servo power
+input with the correct polarity; USB alone does not power the servos. Connect USB to the laptop.
+Keep the servo horns clear of fingers and loose cables. Use `python -m serial.tools.list_ports`
+to find the board port (for example `/dev/tty.usbmodem...`, `/dev/ttyUSB0`, or `COM3`). Replace
+`PORT` below with your actual port.
 
 ### 3. One servo at a time: ID, status, angle
 
@@ -55,7 +58,7 @@ words are not shell variables. Power cycle after the ID change. Label the servos
 position command (degrees relative to the servo's factory center):
 
 ```bash
-python sim/servo_lab.py angle --port PORT --id 2 --degrees 10
+python sim/servo_lab.py angle --port PORT --id 2 --degrees 10 --speed 40
 python sim/servo_lab.py status --port PORT --ids 2
 ```
 
@@ -63,26 +66,12 @@ Remove any horn or load before commanding a position: a servo can move to its fa
 For a first motion test, `sweep` moves only ±10° from the **current** position and returns:
 
 ```bash
-python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40
+python sim/servo_lab.py sweep --port PORT --id 1 --amplitude 10 --speed 40
 ```
 
-The demo limits angle commands to ±30°. Do not force a powered servo by hand. A servo that
-reports an input-voltage error must have its power issue corrected before a sweep.
-
-The STS3215 **1:147, 1:191 and 1:345** variants all use the same 4096-tick output position scale,
-so the requested angle does **not** get multiplied by the gear ratio. The ratio changes the
-mechanical speed and torque. To label what is on the bus and choose a slower command speed:
-
-```bash
-python sim/servo_lab.py status --port PORT --ids 1 2 --gear-ratios 147 345
-python sim/servo_lab.py angle --port PORT --id 1 --degrees 10 --gear-ratio 147 --speed 40
-```
-
-`--gear-ratio`/`--gear-ratios` label the motors in the output; `--speed` sets the servo's motion
-speed (default 60, allowed 1–200). The usual STS3215 labels are **C046 = 1:147**,
-**C044 = 1:191**, and **C001 = 1:345**. Some high-torque units, such as **C018/C047**, are
-**12 V** versions. Read the voltage on each actual label: **do not daisy-chain 7.4 V and 12 V
-servos on one powered bus**. Give the 12 V motor its own suitable board/power supply for this lab.
+The demo limits angle commands to ±30°. Do not force a powered servo by hand; these motors are
+strong. A servo that reports an input-voltage error must have its power issue corrected before a
+sweep. The `status` line should read close to 12 V.
 
 ### 4. Daisy chain and compare sim with hardware
 
@@ -96,15 +85,8 @@ First run the two-servo simulation alone. On macOS use `mjpython`; on Linux and 
 `python` (Windows path: `sim\servo_lab.py`):
 
 ```bash
-mjpython sim/servo_lab.py demo                  # macOS, sim only
-mjpython sim/servo_lab.py demo --port PORT --ids 1 2  # macOS, sim + hardware
-```
-
-For mixed ratios, add `--gear-ratios 147 191` (in the same order as `--ids 1 2`). You can
-also set separate motion speeds with `--speeds 40 60`:
-
-```bash
-mjpython sim/servo_lab.py demo --port PORT --ids 1 2 --gear-ratios 147 191 --speeds 40 60
+mjpython sim/servo_lab.py demo                                    # macOS, sim only
+mjpython sim/servo_lab.py demo --port PORT --ids 1 2 --speeds 40 40  # macOS, sim + hardware
 ```
 
 On Linux/Windows, replace `mjpython` with `python`. Click the viewer, then use **←/→** for servo
@@ -115,7 +97,6 @@ positions when the viewer opens. Keep both motors free to turn.
 **Try to explain:** Why must IDs differ on one bus? Which values in `status` are measurements,
 and which command sets a target? What happens to the sim when a hardware command fails?
 
-For a step-by-step mixed-ratio setup, use the [servo daisy-chain guide](hardware/SERVO_DAISY_CHAIN.md).
 The full walking duck sim is still available: [sim/README.md](sim/README.md).
 
 ### 5. Minimal prints for one leg
