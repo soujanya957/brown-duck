@@ -226,7 +226,7 @@ def main():
         ratios = [None] * len(args.ids)
     if args.command == "demo" and ratios is None:
         ratios = [None, None]
-    if ratios and any(r <= 0 for r in ratios):
+    if ratios and any(r is not None and r <= 0 for r in ratios):
         parser.error("gear ratios must be positive denominators, such as 147, 191, or 345")
     if args.command in ("angle", "sweep") and args.gear_ratio is not None and args.gear_ratio <= 0:
         parser.error("--gear-ratio must be a positive denominator")
