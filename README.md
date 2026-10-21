@@ -23,7 +23,8 @@ both on one bus. After that, try the two-servo simulation and mirror it to the r
 These are the **12 V, 1:345** high-torque STS3215 units (label **C018** or **C047**). Check that
 both labels say **12 V** before powering anything. The lab only uses these motors. For other gear
 ratios (1:147, 1:191, 7.4 V 1:345) and their power rules, see
-[hardware/SERVO_VARIANTS.md](hardware/SERVO_VARIANTS.md).
+[hardware/SERVO_VARIANTS.md](hardware/SERVO_VARIANTS.md). To chain servos with different gear ratios,
+follow [hardware/SERVO_DAISY_CHAIN.md](hardware/SERVO_DAISY_CHAIN.md).
 
 ### 1. Get ready
 
