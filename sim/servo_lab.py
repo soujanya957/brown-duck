@@ -65,6 +65,16 @@ class Bus:
         for warning in sorted(warnings):
             print(f"  Servo warning: {warning}")
 
+    def scan(self, first, last):
+        found = []
+        for motor_id in range(first, last + 1):
+            model, result, _ = self.packet.ping(motor_id)
+            if result == self.success:
+                found.append(motor_id)
+                print(f"Found ID {motor_id} (model {model})")
+        if not found:
+            print(f"No servo answered on IDs {first}–{last}. Check power, cable and port.")
+
     def move(self, motor_id, ticks, speed=DEFAULT_SPEED):
         if not 0 <= ticks <= 4095:
             raise ValueError("Target outside 0–4095 ticks")
@@ -170,13 +180,16 @@ def sweep(bus, motor_id, amplitude, speed, pause):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("status", "set-id", "angle", "sweep", "demo"):
+    for name in ("scan", "status", "set-id", "angle", "sweep", "demo"):
         p = sub.add_parser(name)
         if name != "demo":
             p.add_argument("--port", required=True, help="serial port, e.g. /dev/tty.usbmodem... or COM3")
         else:
             p.add_argument("--port", help="add hardware mirroring; omit for simulation only")
             p.add_argument("--ids", nargs=2, type=int, default=[1, 2], metavar=("FIRST", "SECOND"))
+        if name == "scan":
+            p.add_argument("--first", type=int, default=1, help="lowest ID to try (default 1)")
+            p.add_argument("--last", type=int, default=20, help="highest ID to try, up to 253 (default 20)")
         if name == "status":
             p.add_argument("--ids", nargs="+", type=int, required=True)
             p.add_argument("--gear-ratios", nargs="+", type=int, metavar="RATIO", help="one ratio denominator per ID, for display (e.g. 147 191)")
@@ -200,6 +213,8 @@ def main():
     args = parser.parse_args()
     if args.command == "angle" and not -MAX_DEGREES <= args.degrees <= MAX_DEGREES:
         parser.error("--degrees must be between -30 and 30")
+    if args.command == "scan" and not 1 <= args.first <= args.last <= 253:
+        parser.error("scan needs 1 <= --first <= --last <= 253")
     if args.command == "set-id" and (not 1 <= args.old_id <= 253 or not 1 <= args.new_id <= 253 or args.old_id == args.new_id):
         parser.error("IDs must be different and between 1 and 253")
     if args.command == "demo" and (len(set(args.ids)) != 2 or any(not 1 <= i <= 253 for i in args.ids)):
@@ -223,7 +238,9 @@ def main():
         parser.error("--speeds must each be between 1 and 200")
     bus = Bus(args.port) if args.port else None
     try:
-        if args.command == "status":
+        if args.command == "scan":
+            bus.scan(args.first, args.last)
+        elif args.command == "status":
             for motor_id, ratio in zip(args.ids, ratios):
                 bus.status(motor_id, ratio)
         elif args.command == "set-id":

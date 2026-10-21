@@ -34,30 +34,66 @@ No conda yet? Follow [sim/INSTALL_CONDA.md](sim/INSTALL_CONDA.md), or the
 ### 2. Wire and find the port
 
 Power **off** while plugging servos in. Connect the **12 V** supply to the adapter's servo power
-input with the correct polarity; USB alone does not power the servos. Connect USB to the laptop.
-Keep the servo horns clear of fingers and loose cables. Use `python -m serial.tools.list_ports`
-to find the board port (for example `/dev/tty.usbmodem...`, `/dev/ttyUSB0`, or `COM3`). Replace
-`PORT` below with your actual port.
+input with the correct polarity; USB alone does not power the servos. Plug **one servo** into the
+adapter and connect the adapter's USB cable to the laptop. Keep the servo horns clear of fingers
+and loose cables.
+
+**Find the port.** With the conda environment active, list serial ports, unplug the adapter's
+USB cable, and list them again. The entry that disappeared is your adapter:
+
+```bash
+python -m serial.tools.list_ports -v
+```
+
+| OS | Typical adapter port | Ignore |
+|---|---|---|
+| macOS | `/dev/cu.usbmodem...` or `/dev/cu.usbserial-...` | `/dev/cu.Bluetooth...`, `/dev/cu.debug-console`, `/dev/cu.wlan-debug` |
+| Linux | `/dev/ttyUSB0` or `/dev/ttyACM0` | `/dev/ttyS*` |
+| Windows | `COM3`, `COM4`, ... (also in Device Manager → Ports) | `COM1` |
+
+On macOS use the `/dev/cu.` name, not `/dev/tty.`. On Linux, if you get "permission denied", run
+`sudo usermod -aG dialout $USER` and log out and back in. If no new port appears, try another USB
+cable (some only charge) and check the adapter's driver.
+
+In every command below, replace `PORT` with that name, for example
+`--port /dev/cu.usbmodem5A7A0185861`. It is not a shell variable.
 
 ### 3. One servo at a time: ID, status, angle
 
-**Only one servo may be connected while changing an ID.** New servos often share ID 1. With the
-first servo connected and powered, check its current ID, then assign 1 if needed. Disconnect
-power, swap in the second servo, and assign it ID 2. This example assumes the second servo
-currently has ID 1:
+Every servo on a bus needs its **own ID**. New servos usually come set to ID 1, so two new servos
+on one bus would collide. Set the IDs **with only one servo connected**.
+
+**Servo 1.** With just the first servo plugged in and powered, find its current ID:
 
 ```bash
-python sim/servo_lab.py status --port PORT --ids 1
+python sim/servo_lab.py scan --port PORT
+```
+
+This pings IDs 1–20 and prints `Found ID n`. (Add `--last 253` to check every ID if nothing
+answers.) If it found ID 1, leave it. If it found another ID, say 5, change it to 1:
+
+```bash
+python sim/servo_lab.py set-id --port PORT --old-id 5 --new-id 1
+```
+
+**Servo 2.** Turn power off, unplug servo 1, plug in servo 2, and turn power on. Scan again, then
+set it to ID 2 (here it started at ID 1):
+
+```bash
+python sim/servo_lab.py scan --port PORT
 python sim/servo_lab.py set-id --port PORT --old-id 1 --new-id 2
+```
+
+`set-id` turns torque off and saves the new ID in the servo's memory, so it keeps it after power
+off. **Power cycle** the servo, then confirm it answers on the new ID:
+
+```bash
 python sim/servo_lab.py status --port PORT --ids 2
 ```
 
-For the first servo, change `--new-id 2` to `--new-id 1` if its current ID is not 1.
-If it is already ID 1, leave it alone. If the second servo has another ID, replace `1` in
-`--ids 1` and `--old-id 1` with that number. Replace `PORT` with the actual serial port; these
-words are not shell variables. Power cycle after the ID change. Label the servos **1** and
-**2**. With just one connected, try a small
-position command (degrees relative to the servo's factory center):
+`status` prints position, voltage (should be near 12 V) and temperature. Label the servos **1** and
+**2**. With just servo 2 connected, try a small position command (degrees relative to the servo's
+factory center):
 
 ```bash
 python sim/servo_lab.py angle --port PORT --id 2 --degrees 10 --speed 40
@@ -68,7 +104,7 @@ Remove any horn or load before commanding a position: a servo can move to its fa
 For a first motion test, `sweep` moves only ±10° from the **current** position and returns:
 
 ```bash
-python sim/servo_lab.py sweep --port PORT --id 1 --amplitude 10 --speed 40
+python sim/servo_lab.py sweep --port PORT --id 2 --amplitude 10 --speed 40
 ```
 
 The demo limits angle commands to ±30°. Do not force a powered servo by hand; these motors are
