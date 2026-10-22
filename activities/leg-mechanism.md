@@ -78,7 +78,7 @@ model balance or command the physical servos.
 The [standalone lower-body URDF](../sim/model/lower_body.urdf) can be viewed with the
 same gait: `mjpython sim/urdf_walk.py` on macOS or `python sim/urdf_walk.py` on
 Linux/Windows. Run `python sim/urdf_walk.py --check` for a no-window check, or watch
-the [URDF walking clip](../docs/videos/urdf-walk.mp4). The [README](../README.md#2-watch-the-build-and-open-the-walking-simulator)
+the [URDF walking clip](../docs/videos/urdf-walk.mp4). The [README](../README.md#set-up-and-preview)
 has the setup and daisy-chain commands.
 
 For the physical one-leg milestone, use the supported linkage and small individual `sweep` commands to create a lift, forward motion and return. Write down the three joint positions that produce each phase. Once both legs and a supported body are assembled and calibrated, those phases can be alternated for a walking experiment. The [full walking simulator](../sim/README.md) demonstrates a trained controller for the complete duck.
@@ -87,13 +87,47 @@ For the physical one-leg milestone, use the supported linkage and small individu
 
 ## After both legs are assembled: calibration and exploration
 
-Connect and verify all ten unique IDs, then follow the [README's lower-body sequence](../README.md#after-both-legs-and-hips-are-assembled):
+First assign IDs to the right leg one servo at a time with
+`python sim/duck_tools.py setup-motors --port PORT --robot right-leg`:
+hip yaw **10**, hip roll **11**, hip pitch **12**, knee **13**, ankle **14**.
+Power off before connecting the two legs to the bus. Power on and check every ID:
 
-1. `python sim/duck_tools.py calibrate --port PORT --robot lower-body` turns torque off, displays current/min/max positions live, and saves `calibration/lower-body.json`.
-2. `python sim/duck_tools.py joint-teleop --port PORT` lets you type one small command such as `left_knee +5`; `read` displays every position and calibrated range.
-3. Use `mjpython sim/urdf_walk.py --target 0.01 -0.145` on macOS or `python sim/urdf_walk.py --target 0.01 -0.145` on Linux/Windows to inspect one IK target. Then open `sim/urdf_walk.py` without `--target` to watch the gait.
+```bash
+python sim/servo_lab.py status --port PORT --ids 10 11 12 13 14 20 21 22 23 24
+```
 
-Support the lower body throughout calibration and motor control. Record what a positive tick change actually does before comparing physical joints with model angles:
+### 1. Calibrate the assembled lower body
+
+Support the lower body before releasing torque. Run:
+
+```bash
+python sim/duck_tools.py calibrate --port PORT --robot lower-body
+```
+
+The command turns torque off. Place every joint at its neutral pose and press Enter.
+Then move each joint gently through its safe mechanical range. The terminal shows
+the current position and observed minimum and maximum for **all ten joints** live.
+Press Enter to finish and inspect `calibration/lower-body.json`. Repeat calibration
+if a joint was not moved or its recorded range looks wrong.
+
+### 2. Control and observe one motor at a time
+
+Keep the lower body supported. Run:
+
+```bash
+python sim/duck_tools.py joint-teleop --port PORT
+```
+
+At the `joint>` prompt, type `read` to see every position and limit. Try
+`left_knee +5`, `left_knee -5`, then another joint. Each command moves only the
+named motor by at most 5° and keeps a 2° buffer inside the observed limits. The
+first command to a motor sets its goal to its live position before enabling torque.
+Type `quit` when finished; the servos continue holding until servo power is turned
+off. Turn power off before changing cables.
+
+Students: record what a positive tick change actually does before comparing physical
+joints with model angles. Does the left side mirror the right? Which joints move the
+foot forward, sideways, or upward?
 
 | Joint | ID | Neutral ticks | Safe min–max | Motion from `+5` |
 |---|---:|---:|---|---|
@@ -107,3 +141,19 @@ Support the lower body throughout calibration and motor control. Record what a p
 | Left hip pitch | 22 | | | |
 | Left knee | 23 | | | |
 | Left ankle | 24 | | | |
+
+### 3. Try IK, then the gait
+
+Choose a target foot location `(x, z)` relative to the hip. This example places
+the foot 0.01 m forward and 0.145 m below it. The viewer prints model hip, knee,
+and ankle angles while showing a static pose:
+
+```bash
+mjpython sim/urdf_walk.py --target 0.01 -0.145  # macOS
+python sim/urdf_walk.py --target 0.01 -0.145    # Linux / Windows
+```
+
+Predict what a slightly larger `x` will do, then rerun with that value. Finally,
+open `sim/urdf_walk.py` without `--target` to watch alternating stance and swing.
+The gait is a supported MuJoCo preview. Real joint directions and neutral
+positions must be mapped before sending IK angles to physical servos.
