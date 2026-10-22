@@ -144,7 +144,7 @@ See [CREDITS.md](CREDITS.md) for where these files come from.
 
 ## Two-servo lab
 
-For this week's group activity, see the [root README](../README.md#todays-meeting-servo-lab).
+For the archived group activity, see the [archived servo lab](../activities/servo-lab.md).
 `servo_lab.py demo` opens a small two-joint MuJoCo scene. Arrow keys move its two joints in
 5° steps. Add `--port PORT --ids 1 2` to send the same relative moves to two connected STS3215
 servos. The lab uses this same conda environment and Feetech's Python SDK.
@@ -160,6 +160,8 @@ From the repo root, run `mjpython sim/legs.py` on macOS or `python sim/legs.py` 
 This viewer keeps the original two leg assemblies and their ten joints, with the body and head
 hidden and the hips anchored. It bends the knees slowly to show the linkage. Add
 `--preview docs/images/legs-only.png` to save a still instead of opening the viewer.
+Add `--gait` to show alternating fixed-hip steps from a two-link inverse kinematics calculation;
+the [leg mechanism lab](../activities/leg-mechanism.md) explains the exercise.
 
 To make one small hardware sweep from the live position, run
 `python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40`.

@@ -1,6 +1,7 @@
 """View only the Open Duck Mini v2 leg mechanisms in MuJoCo.
 
 Run from the repository root: mjpython sim/legs.py (macOS), python sim/legs.py (Linux/Windows).
+Use --gait to preview alternating steps with a simple planar two-link IK model.
 Use --preview PATH to render a still image without opening a viewer.
 """
 
@@ -20,6 +21,26 @@ LEG_NAMES = (
     "left_hip_yaw", "left_hip_roll", "left_hip_pitch", "left_knee", "left_ankle",
     "right_hip_yaw", "right_hip_roll", "right_hip_pitch", "right_knee", "right_ankle",
 )
+LINK_LENGTH = 0.07865  # hip-to-knee and knee-to-ankle, from the MuJoCo model (metres)
+
+
+def two_link_ik(x, z, upper=LINK_LENGTH, lower=LINK_LENGTH):
+    """Hip and knee for an ankle target x forward, z downward from the hip."""
+    distance_squared = x * x + z * z
+    if not (upper - lower) ** 2 < distance_squared < (upper + lower) ** 2:
+        raise ValueError("Ankle target is outside the two-link workspace")
+    knee = math.acos((distance_squared - upper * upper - lower * lower) / (2 * upper * lower))
+    hip = math.atan2(x, -z) - math.atan2(lower * math.sin(knee), upper + lower * math.cos(knee))
+    return hip, knee
+
+
+def gait_target(phase):
+    """Small stance sweep and raised swing, returning the ankle target in metres."""
+    cycle = (phase / (2 * math.pi)) % 1
+    if cycle < 0.5:
+        return 0.012 - 0.048 * cycle, -0.145
+    swing = (cycle - 0.5) * 2
+    return -0.012 + 0.024 * swing, -0.145 + 0.007 * math.sin(math.pi * swing)
 
 
 def load_legs():
@@ -56,17 +77,24 @@ def load_legs():
     return model, data
 
 
-def pose(model, data, phase):
+def pose(model, data, phase, gait=False):
     """A small symmetric bend makes the four visible leg links easy to distinguish."""
-    bend = 0.2 + 0.12 * math.sin(phase)
-    targets = {
-        "left_hip_pitch": -0.35,
-        "left_knee": 0.7 + bend,
-        "left_ankle": -0.35 - bend,
-        "right_hip_pitch": 0.35,
-        "right_knee": 0.7 + bend,
-        "right_ankle": -0.35 - bend,
-    }
+    if gait:
+        left_hip, left_knee = two_link_ik(*gait_target(phase))
+        right_hip, right_knee = two_link_ik(*gait_target(phase + math.pi))
+        targets = {
+            "left_hip_pitch": left_hip, "left_knee": left_knee,
+            "left_ankle": -left_hip - left_knee,
+            "right_hip_pitch": -right_hip, "right_knee": right_knee,
+            "right_ankle": right_hip - right_knee,
+        }
+    else:
+        bend = 0.2 + 0.12 * math.sin(phase)
+        targets = {
+            "left_hip_pitch": -0.35, "left_knee": 0.7 + bend,
+            "left_ankle": -0.35 - bend, "right_hip_pitch": 0.35,
+            "right_knee": 0.7 + bend, "right_ankle": -0.35 - bend,
+        }
     for i, name in enumerate(LEG_NAMES):
         data.ctrl[i] = targets.get(name, 0)
     mujoco.mj_step(model, data)
@@ -85,10 +113,11 @@ def camera():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preview", type=Path, help="write a PNG still instead of opening the viewer")
+    parser.add_argument("--gait", action="store_true", help="alternate small IK foot steps in the fixed-hip viewer")
     args = parser.parse_args()
     model, data = load_legs()
     for _ in range(150):
-        pose(model, data, 0)
+        pose(model, data, 0, args.gait)
     if args.preview:
         with mujoco.Renderer(model, height=480, width=640) as renderer:
             renderer.update_scene(data, camera=camera())
@@ -98,7 +127,7 @@ def main():
         Image.fromarray(np.asarray(pixels)).save(args.preview)
         print(f"Saved {args.preview}")
         return
-    print("Showing only the two leg mechanisms. Close the viewer to quit.")
+    print("Showing the fixed-hip leg mechanisms. Close the viewer to quit.")
     with mujoco.viewer.launch_passive(model, data) as viewer:
         viewer.cam.lookat[:] = camera().lookat
         viewer.cam.distance = camera().distance
@@ -106,7 +135,7 @@ def main():
         viewer.cam.elevation = camera().elevation
         start = time.monotonic()
         while viewer.is_running():
-            pose(model, data, (time.monotonic() - start) * 2)
+            pose(model, data, (time.monotonic() - start) * 2, args.gait)
             viewer.sync()
             time.sleep(model.opt.timestep)
 

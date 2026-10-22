@@ -1,6 +1,6 @@
 # Other STS3215 gear ratios and power
 
-The [servo lab in the main README](../README.md#todays-meeting-servo-lab) only uses the
+The [archived servo lab](../activities/servo-lab.md) only uses the
 **12 V, 1:345 high-torque** STS3215 (the one with the square-wave mark, label C018 or C047).
 This page covers the other STS3215 variants and how to power them. For wiring a mixed chain step
 by step, see the [servo daisy-chain guide](SERVO_DAISY_CHAIN.md).

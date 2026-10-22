@@ -3,7 +3,7 @@
 This guide wires two or three STS3215 servos with **different gear ratios** (for example a 1:147,
 a 1:191 and a 1:345) onto one bus and drives them with the
 [two-servo lab script](../sim/servo_lab.py). For the 12 V high-torque lab only, follow the
-[main README](../README.md#todays-meeting-servo-lab) instead. Variant details are in
+[archived servo lab](../activities/servo-lab.md) instead. Variant details are in
 [SERVO_VARIANTS.md](SERVO_VARIANTS.md).
 
 Run every command from the `brown-duck/` repo root in the `brown-duck` conda environment:
