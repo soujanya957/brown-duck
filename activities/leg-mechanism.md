@@ -75,6 +75,12 @@ within 1 mm of their world positions and the swing feet lift. The script holds t
 pelvis upright and advances it at the speed of the backward stance sweep; it does not
 model balance or command the physical servos.
 
+The [standalone lower-body URDF](../sim/model/lower_body.urdf) can be viewed with the
+same gait: `mjpython sim/urdf_walk.py` on macOS or `python sim/urdf_walk.py` on
+Linux/Windows. Run `python sim/urdf_walk.py --check` for a no-window check, or watch
+the [URDF walking clip](../docs/videos/urdf-walk.mp4). The [README](../README.md#open-the-lower-body-urdf-walking-simulator)
+has the setup and daisy-chain commands.
+
 For the physical one-leg milestone, use the supported linkage and small individual `sweep` commands to create a lift, forward motion and return. Write down the three joint positions that produce each phase. Once both legs and a supported body are assembled and calibrated, those phases can be alternated for a walking experiment. The [full walking simulator](../sim/README.md) demonstrates a trained controller for the complete duck.
 
 **Discuss:** Why do IDs have to differ? Why does a knee bend change foot height even when hip pitch stays still? What happens when a requested foot position is farther than the two links can reach? Which measurements are needed before model angles can be used on real hardware?

@@ -33,22 +33,65 @@ servo meshes come from the
 [Open Duck Mini v2 model](Open_Duck_Mini/mini_bdx/robots/open_duck_mini_v2/robot.xml).
 Use the [assembly guide](Open_Duck_Mini/docs/assembly_guide.md) for the exact hardware steps.
 
-### Simple IK walking demo
+### Open the lower-body URDF walking simulator
 
-[![Watch the simple IK walk](docs/images/ik-walk-poster.png)](docs/videos/ik-walk.mp4)
-
-The [walking clip](docs/videos/ik-walk.mp4) comes from a small
-[two-link IK controller](sim/ik_walk.py): each foot stays roughly in place during stance,
-lifts during swing, and the supported pelvis moves forward. Run it in MuJoCo:
+The [lower-body URDF](sim/model/lower_body.urdf) contains both legs, all ten leg joints,
+and the inner pelvis without the outer shell. It uses the original Open Duck Mini v2
+joint frames and meshes. Clone the submodule and install the simulator once:
 
 ```bash
-mjpython sim/ik_walk.py         # macOS viewer
-python sim/ik_walk.py           # Linux / Windows viewer
-python sim/ik_walk.py --check   # headless gait check
+git submodule update --init --recursive
+conda env create -f sim/environment.yml
+conda activate brown-duck
 ```
 
-This is a kinematic lower-body demonstration. It sets joint positions and supports the
-pelvis; balancing and real-servo calibration are separate steps.
+From the repository root, open the URDF in the MuJoCo viewer:
+
+```bash
+mjpython sim/urdf_walk.py         # macOS
+python sim/urdf_walk.py           # Linux / Windows
+python sim/urdf_walk.py --check   # headless gait check on any OS
+```
+
+Close the viewer window to stop. The [URDF walker](sim/urdf_walk.py) alternates a
+two-link inverse-kinematics stance and swing for each foot while the pelvis advances.
+The [earlier MJCF IK preview](docs/videos/ik-walk.mp4) remains available too.
+
+[![Watch the lower-body URDF walk](docs/images/urdf-walk-poster.png)](docs/videos/urdf-walk.mp4)
+
+This is a supported kinematic demonstration: the pelvis follows a prescribed path.
+The extracted URDF uses placeholder inertias and omits collisions, so it is for
+kinematic viewing rather than dynamic balance tests. It does not send commands to
+real servos. Run
+`python sim/urdf_walk.py --video` to regenerate the clip (requires FFmpeg).
+
+### Daisy-chain the assembled leg and run a first motion
+
+Give each servo its own ID **before** connecting the chain. For the left leg, use
+hip yaw **20**, hip roll **21**, hip pitch **22**, knee **23**, and ankle **24**.
+Read each servo's rated voltage and use a regulated supply at that voltage on the
+Waveshare adapter's servo power input; USB carries data, not motor power. All motors
+on one chain must have the same rated voltage.
+
+1. Connect the adapter by USB and find its port: `python sim/duck_tools.py find-port`.
+   Replace `PORT` below with the reported port.
+2. With servo power off, connect **one servo at a time**. Run
+   `python sim/duck_tools.py setup-motors --port PORT --robot left-leg` and follow
+   its prompts. It assigns the five IDs and centers each servo; remove the horn
+   before centering. Power off before changing each cable.
+3. With power off, cable **Waveshare adapter → first servo → next servo → ...**
+   using each servo's second bus socket. Chain order does not set the IDs.
+4. Power on, support the assembled leg, then check and gently move the knee:
+
+   ```bash
+   python sim/servo_lab.py status --port PORT --ids 20 21 22 23 24
+   python sim/servo_lab.py sweep --port PORT --id 23 --amplitude 5 --speed 40
+   ```
+
+Keep the foot clear of the table and stop if any joint binds. The
+[leg mechanism worksheet](activities/leg-mechanism.md) covers a three-joint option,
+assembly, calibration, and troubleshooting. The URDF walking command above is a
+simulation command; the supported `sweep` is the first physical motion.
 
 The previous [servo lab](activities/servo-lab.md) remains available with the same commands
 for ID setup, status, angle sweeps and the two-servo demo. The
@@ -66,7 +109,8 @@ for ID setup, status, angle sweeps and the two-servo demo. The
   `hardware.md`, `software.md`, `open-ended.md`);
   your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
-- **`sim/`**: walking simulator, simple IK gait (`ik_walk.py`), the two-servo lab
+- **`sim/`**: walking simulator, lower-body URDF (`model/lower_body.urdf`) and IK
+  walker (`urdf_walk.py`), the two-servo lab
   (`teleop.py`, `servo_lab.py`), and the
   `brown-duck-*` commands (`duck_tools.py`, installed by `pip install -e .`)
 - **`Open_Duck_Mini/`** (git submodule, our fork of upstream): the hardware hub

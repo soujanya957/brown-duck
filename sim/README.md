@@ -169,6 +169,16 @@ targets and moves a supported pelvis forward while the feet alternate. Run
 `python sim/ik_walk.py --check` without a window, or `python sim/ik_walk.py --video`
 to regenerate the [walking clip](../docs/videos/ik-walk.mp4) (requires FFmpeg).
 
+The standalone [lower-body URDF](model/lower_body.urdf) keeps both hip and leg
+assemblies and the inner pelvis. Open its walking preview with
+`mjpython sim/urdf_walk.py` on macOS or `python sim/urdf_walk.py` on Linux/Windows.
+`python sim/urdf_walk.py --check` checks both stance feet without a window;
+`python sim/urdf_walk.py --video` regenerates the [URDF walking clip](../docs/videos/urdf-walk.mp4).
+Run `python sim/generate_lower_body_urdf.py` to re-extract the URDF after an upstream
+model change. The submodule meshes must be present (`git submodule update --init --recursive`).
+The extracted URDF has placeholder inertias and no collision geometry; this preview
+sets poses directly and does not test balance or physical contacts.
+
 To make one small hardware sweep from the live position, run
 `python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40`.
 The command reads the current position first and refuses to move if the servo reports an error.

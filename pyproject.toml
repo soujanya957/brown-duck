@@ -7,7 +7,7 @@ name = "brown-duck"
 version = "0.1.0"
 description = "Servo tools for the brown-duck Open Duck Mini build"
 requires-python = ">=3.10"
-dependencies = ["ftservo-python-sdk>=2,<3", "pyserial", "mujoco", "numpy"]
+dependencies = ["ftservo-python-sdk>=2,<3", "pyserial", "mujoco>=3.3", "numpy"]
 
 [project.scripts]
 brown-duck-find-port = "duck_tools:find_port"

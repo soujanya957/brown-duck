@@ -1,4 +1,4 @@
-mujoco
+mujoco>=3.3
 onnxruntime
 numpy
 ftservo-python-sdk>=2,<3
