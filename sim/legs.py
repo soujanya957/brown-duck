@@ -38,16 +38,29 @@ def gait_target(phase):
     """Small stance sweep and raised swing, returning the ankle target in metres."""
     cycle = (phase / (2 * math.pi)) % 1
     if cycle < 0.5:
-        return 0.012 - 0.048 * cycle, -0.145
+        return 0.018 - 0.072 * cycle, -0.145
     swing = (cycle - 0.5) * 2
-    return -0.012 + 0.024 * swing, -0.145 + 0.007 * math.sin(math.pi * swing)
+    return -0.018 + 0.036 * swing, -0.145 + 0.012 * math.sin(math.pi * swing)
 
 
-def load_legs():
-    """Keep the original leg branches and position actuators, anchored at the invisible hip."""
+def ik_joint_targets(phase):
+    """Planar IK targets for alternating feet, with mirrored hip pitch joints."""
+    left_hip, left_knee = two_link_ik(*gait_target(phase))
+    right_hip, right_knee = two_link_ik(*gait_target(phase + math.pi))
+    return {
+        "left_hip_pitch": left_hip, "left_knee": left_knee,
+        "left_ankle": -left_hip - left_knee,
+        "right_hip_pitch": -right_hip, "right_knee": right_knee,
+        "right_ankle": -right_hip - right_knee,
+    }
+
+
+def load_legs(*, keep_pelvis=False, floor=False):
+    """Keep the leg branches and position actuators on a fixed base."""
     root = ET.parse(MODEL).getroot()
     visual = ET.Element("visual")
     ET.SubElement(visual, "headlight", ambient="0.55 0.55 0.55", diffuse="0.55 0.55 0.55")
+    ET.SubElement(visual, "global", offwidth="1920", offheight="1080")
     root.insert(2, visual)
     ET.SubElement(root.find("asset"), "texture", type="skybox", builtin="gradient", rgb1="0.82 0.88 0.95", rgb2="0.82 0.88 0.95", width="512", height="512")
     world = root.find("worldbody")
@@ -58,8 +71,21 @@ def load_legs():
         if child.tag == "site":
             base.remove(child)
     for child in list(trunk):
-        if child.tag in {"geom", "site"} or (child.tag == "body" and child.get("name") == "neck_pitch_assembly"):
+        pelvis = child.tag == "geom" and child.get("mesh") in {"trunk_bottom", "trunk_top"}
+        if (child.tag in {"geom", "site"} and not (keep_pelvis and pelvis)) or (child.tag == "body" and child.get("name") == "neck_pitch_assembly"):
             trunk.remove(child)
+    if keep_pelvis:
+        for body in trunk.iter("body"):
+            for geom in list(body.findall("geom")):
+                if geom.get("mesh") in {"left_cache", "right_cache"}:
+                    body.remove(geom)
+    if floor:
+        asset = root.find("asset")
+        ET.SubElement(asset, "texture", name="walk_grid", type="2d", builtin="checker",
+                      rgb1="0.22 0.25 0.28", rgb2="0.16 0.19 0.22", width="512", height="512")
+        ET.SubElement(asset, "material", name="walk_floor", texture="walk_grid", texrepeat="24 24")
+        ET.SubElement(world, "geom", type="plane", name="floor", pos="0 0 0.018",
+                      size="2 2 0.01", material="walk_floor", contype="0", conaffinity="0")
     sensor = root.find("sensor")
     if sensor is not None:
         root.remove(sensor)
@@ -80,14 +106,7 @@ def load_legs():
 def pose(model, data, phase, gait=False):
     """A small symmetric bend makes the four visible leg links easy to distinguish."""
     if gait:
-        left_hip, left_knee = two_link_ik(*gait_target(phase))
-        right_hip, right_knee = two_link_ik(*gait_target(phase + math.pi))
-        targets = {
-            "left_hip_pitch": left_hip, "left_knee": left_knee,
-            "left_ankle": -left_hip - left_knee,
-            "right_hip_pitch": -right_hip, "right_knee": right_knee,
-            "right_ankle": right_hip - right_knee,
-        }
+        targets = ik_joint_targets(phase)
     else:
         bend = 0.2 + 0.12 * math.sin(phase)
         targets = {

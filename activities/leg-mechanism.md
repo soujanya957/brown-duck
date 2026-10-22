@@ -2,7 +2,7 @@
 
 **Goal:** assemble one left leg, connect its servos on one Waveshare bus servo adapter, make a small supported step, and see how foot position maps to joint angles. The first leg is a mechanism test: it cannot walk across the floor by itself. A free-standing walk needs both legs, a body, balance and control.
 
-Watch the [left-leg assembly video](../docs/videos/leg-assembly.mp4) for the build order, then use the step-by-step photos and notes below for details.
+Watch the [MuJoCo lower-body assembly animation](../docs/videos/leg-assembly.mp4) to see both leg and hip mechanisms. This lab builds the left leg first; use the step-by-step photos and notes below for details.
 
 Run commands from the `brown-duck/` repository root. If this is your first lab, follow the [archived servo lab setup](servo-lab.md#1-get-ready) to install and activate the `brown-duck` environment. Bring the printed parts, five STS3215 servos for the full leg (or three for a hip-pitch/knee/ankle linkage), horns, bus cables, appropriate screws and bearings, a Waveshare bus servo adapter, USB cable and a regulated external servo supply.
 
@@ -67,6 +67,13 @@ python sim/legs.py --gait     # Linux / Windows
 The hips are fixed in the viewer. The feet alternate a short **stance sweep** and a raised **swing return**. This shows a stepping mechanism, not a balanced walking controller. Close the viewer to stop. Without `--gait`, `sim/legs.py` shows the older slow knee bend.
 
 The code's [`two_link_ik`](../sim/legs.py) treats the hip-to-knee and knee-to-ankle distances as **0.07865 m** each, taken from the MuJoCo model. Given ankle target `(x, z)` relative to the hip, it computes knee bend with the law of cosines, then subtracts the shin angle from the direction to the foot to get hip pitch. Ankle pitch offsets the hip and knee to keep the foot approximately level. The two legs use mirrored hip signs in the model. **These model angles are not servo ticks:** real horns can have different centers and directions, so do not send the simulator's angles to assembled hardware without checking each joint's calibration and limits.
+
+For a simple **two-leg IK walk**, run `mjpython sim/ik_walk.py` on macOS or
+`python sim/ik_walk.py` on Linux/Windows. The [walking clip](../docs/videos/ik-walk.mp4)
+shows the result. `python sim/ik_walk.py --check` verifies that the stance feet stay
+within 1 mm of their world positions and the swing feet lift. The script holds the
+pelvis upright and advances it at the speed of the backward stance sweep; it does not
+model balance or command the physical servos.
 
 For the physical one-leg milestone, use the supported linkage and small individual `sweep` commands to create a lift, forward motion and return. Write down the three joint positions that produce each phase. Once both legs and a supported body are assembled and calibrated, those phases can be alternated for a walking experiment. The [full walking simulator](../sim/README.md) demonstrates a trained controller for the complete duck.
 

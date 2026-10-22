@@ -163,6 +163,12 @@ hidden and the hips anchored. It bends the knees slowly to show the linkage. Add
 Add `--gait` to show alternating fixed-hip steps from a two-link inverse kinematics calculation;
 the [leg mechanism lab](../activities/leg-mechanism.md) explains the exercise.
 
+For a moving lower-body preview, run `mjpython sim/ik_walk.py` on macOS or
+`python sim/ik_walk.py` on Linux/Windows. The controller uses the same two-link IK
+targets and moves a supported pelvis forward while the feet alternate. Run
+`python sim/ik_walk.py --check` without a window, or `python sim/ik_walk.py --video`
+to regenerate the [walking clip](../docs/videos/ik-walk.mp4) (requires FFmpeg).
+
 To make one small hardware sweep from the live position, run
 `python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40`.
 The command reads the current position first and refuses to move if the servo reports an error.

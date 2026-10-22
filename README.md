@@ -25,10 +25,30 @@ exercise. Bring the printed parts, matching-voltage servos, adapter, external se
 supply, USB cable, screws, horns and bearings. One leg can step while held or mounted;
 walking across the floor needs the second leg and body.
 
-[![Watch the left-leg assembly video](docs/images/leg-assembly-poster.png)](docs/videos/leg-assembly.mp4)
+[![Watch the lower-body assembly video](docs/images/leg-assembly-poster.png)](docs/videos/leg-assembly.mp4)
 
-[Watch the 32-second assembly video](docs/videos/leg-assembly.mp4) · CAD views from the
-[Open Duck Mini assembly guide](Open_Duck_Mini/docs/assembly_guide.md).
+[Watch the MuJoCo lower-body assembly animation](docs/videos/leg-assembly.mp4) · both legs,
+hip mechanisms and the inner pelvis mount, without the exterior covers. The parts and
+servo meshes come from the
+[Open Duck Mini v2 model](Open_Duck_Mini/mini_bdx/robots/open_duck_mini_v2/robot.xml).
+Use the [assembly guide](Open_Duck_Mini/docs/assembly_guide.md) for the exact hardware steps.
+
+### Simple IK walking demo
+
+[![Watch the simple IK walk](docs/images/ik-walk-poster.png)](docs/videos/ik-walk.mp4)
+
+The [walking clip](docs/videos/ik-walk.mp4) comes from a small
+[two-link IK controller](sim/ik_walk.py): each foot stays roughly in place during stance,
+lifts during swing, and the supported pelvis moves forward. Run it in MuJoCo:
+
+```bash
+mjpython sim/ik_walk.py         # macOS viewer
+python sim/ik_walk.py           # Linux / Windows viewer
+python sim/ik_walk.py --check   # headless gait check
+```
+
+This is a kinematic lower-body demonstration. It sets joint positions and supports the
+pelvis; balancing and real-servo calibration are separate steps.
 
 The previous [servo lab](activities/servo-lab.md) remains available with the same commands
 for ID setup, status, angle sweeps and the two-servo demo. The
@@ -46,7 +66,8 @@ for ID setup, status, angle sweeps and the two-servo demo. The
   `hardware.md`, `software.md`, `open-ended.md`);
   your ideas go in `activities/ideas/`, your projects in `activities/projects/`
 - **`docs/images/`**: sim pictures (regenerate with `docs/render_screenshots.py`)
-- **`sim/`**: walking simulator, the two-servo lab (`teleop.py`, `servo_lab.py`), and the
+- **`sim/`**: walking simulator, simple IK gait (`ik_walk.py`), the two-servo lab
+  (`teleop.py`, `servo_lab.py`), and the
   `brown-duck-*` commands (`duck_tools.py`, installed by `pip install -e .`)
 - **`Open_Duck_Mini/`** (git submodule, our fork of upstream): the hardware hub
   - `README.md`: CAD, bill of materials, build-guide links
