@@ -78,9 +78,32 @@ model balance or command the physical servos.
 The [standalone lower-body URDF](../sim/model/lower_body.urdf) can be viewed with the
 same gait: `mjpython sim/urdf_walk.py` on macOS or `python sim/urdf_walk.py` on
 Linux/Windows. Run `python sim/urdf_walk.py --check` for a no-window check, or watch
-the [URDF walking clip](../docs/videos/urdf-walk.mp4). The [README](../README.md#open-the-lower-body-urdf-walking-simulator)
+the [URDF walking clip](../docs/videos/urdf-walk.mp4). The [README](../README.md#2-watch-the-build-and-open-the-walking-simulator)
 has the setup and daisy-chain commands.
 
 For the physical one-leg milestone, use the supported linkage and small individual `sweep` commands to create a lift, forward motion and return. Write down the three joint positions that produce each phase. Once both legs and a supported body are assembled and calibrated, those phases can be alternated for a walking experiment. The [full walking simulator](../sim/README.md) demonstrates a trained controller for the complete duck.
 
 **Discuss:** Why do IDs have to differ? Why does a knee bend change foot height even when hip pitch stays still? What happens when a requested foot position is farther than the two links can reach? Which measurements are needed before model angles can be used on real hardware?
+
+## After both legs are assembled: calibration and exploration
+
+Connect and verify all ten unique IDs, then follow the [README's lower-body sequence](../README.md#after-both-legs-and-hips-are-assembled):
+
+1. `python sim/duck_tools.py calibrate --port PORT --robot lower-body` turns torque off, displays current/min/max positions live, and saves `calibration/lower-body.json`.
+2. `python sim/duck_tools.py joint-teleop --port PORT` lets you type one small command such as `left_knee +5`; `read` displays every position and calibrated range.
+3. Use `mjpython sim/urdf_walk.py --target 0.01 -0.145` on macOS or `python sim/urdf_walk.py --target 0.01 -0.145` on Linux/Windows to inspect one IK target. Then open `sim/urdf_walk.py` without `--target` to watch the gait.
+
+Support the lower body throughout calibration and motor control. Record what a positive tick change actually does before comparing physical joints with model angles:
+
+| Joint | ID | Neutral ticks | Safe min–max | Motion from `+5` |
+|---|---:|---:|---|---|
+| Right hip yaw | 10 | | | |
+| Right hip roll | 11 | | | |
+| Right hip pitch | 12 | | | |
+| Right knee | 13 | | | |
+| Right ankle | 14 | | | |
+| Left hip yaw | 20 | | | |
+| Left hip roll | 21 | | | |
+| Left hip pitch | 22 | | | |
+| Left knee | 23 | | | |
+| Left ankle | 24 | | | |

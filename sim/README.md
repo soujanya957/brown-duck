@@ -179,6 +179,13 @@ model change. The submodule meshes must be present (`git submodule update --init
 The extracted URDF has placeholder inertias and no collision geometry; this preview
 sets poses directly and does not test balance or physical contacts.
 
+After both legs are assembled, `python sim/duck_tools.py calibrate --port PORT --robot lower-body`
+shows all ten joint positions and observed limits live, then saves
+`calibration/lower-body.json`. `python sim/duck_tools.py joint-teleop --port PORT`
+accepts one small motor command at a time, such as `left_knee +5`, within those
+recorded limits. The [main README](../README.md#after-both-legs-and-hips-are-assembled)
+gives the complete sequence from wiring to IK and gait.
+
 To make one small hardware sweep from the live position, run
 `python sim/servo_lab.py sweep --port PORT --id 1 --gear-ratio 345 --amplitude 10 --speed 40`.
 The command reads the current position first and refuses to move if the servo reports an error.

@@ -13,6 +13,7 @@ dependencies = ["ftservo-python-sdk>=2,<3", "pyserial", "mujoco>=3.3", "numpy"]
 brown-duck-find-port = "duck_tools:find_port"
 brown-duck-setup-motors = "duck_tools:setup_motors"
 brown-duck-calibrate = "duck_tools:calibrate"
+brown-duck-joint-teleop = "duck_tools:joint_teleop"
 brown-duck-teleoperate = "duck_tools:teleoperate"
 brown-duck-servo = "duck_tools:servo"
 

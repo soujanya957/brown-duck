@@ -15,7 +15,7 @@ import mujoco
 import mujoco.viewer
 import numpy as np
 
-from legs import gait_target, ik_joint_targets
+from legs import gait_target, ik_joint_targets, two_link_ik
 
 URDF = Path(__file__).resolve().parent / "model/lower_body.urdf"
 ROOT = URDF.parents[2]
@@ -66,6 +66,25 @@ def pose(model, data, seconds):
     mujoco.mj_forward(model, data)
 
 
+def target_pose(model, data, x, z):
+    """Show a single IK foot target on both legs before trying the gait."""
+    hip, knee = two_link_ik(x, z)
+    targets = {"left_hip_pitch": hip, "left_knee": knee,
+               "left_ankle": -hip - knee, "right_hip_pitch": -hip,
+               "right_knee": knee, "right_ankle": -hip - knee}
+    data.qpos[:] = model.qpos0
+    for name, angle in targets.items():
+        joint = model.joint(name)
+        if not joint.range[0] <= angle <= joint.range[1]:
+            raise ValueError(f"{name} target {angle:.3f} exceeds its joint range")
+        data.qpos[joint.qposadr[0]] = angle
+    model.body_pos[model.body("trunk_assembly").id] = [0, 0, ROOT_HEIGHT]
+    mujoco.mj_forward(model, data)
+    print(f"Foot target relative to hip: x={x:+.3f} m, z={z:+.3f} m")
+    print(f"Left hip {math.degrees(hip):+.1f}°, knee {math.degrees(knee):+.1f}°, "
+          f"ankle {math.degrees(-hip-knee):+.1f}°")
+
+
 def check():
     model, data = load_model()
     assert model.njnt == 10, f"Expected ten leg joints, found {model.njnt}"
@@ -108,6 +127,20 @@ def viewer():
             time.sleep(1 / 60)
 
 
+def target_viewer(x, z):
+    model, data = load_model()
+    target_pose(model, data, x, z)
+    print("Showing the static IK target. Close the viewer to quit.")
+    with mujoco.viewer.launch_passive(model, data) as window:
+        window.cam.lookat[:] = [0, 0, 0.10]
+        window.cam.distance = 0.58
+        window.cam.azimuth = 135
+        window.cam.elevation = -14
+        while window.is_running():
+            window.sync()
+            time.sleep(1 / 60)
+
+
 def render_video(path, seconds=9.0, fps=24):
     """Render the URDF gait with a fixed camera so forward travel is visible."""
     model, data = load_model()
@@ -146,11 +179,17 @@ def main():
     parser.add_argument("--check", action="store_true", help="verify the URDF gait without a window")
     parser.add_argument("--video", nargs="?", type=Path, const=DEFAULT_VIDEO,
                         help="render an MP4; optional output path (requires FFmpeg)")
+    parser.add_argument("--target", nargs=2, type=float, metavar=("X", "Z"),
+                        help="show a static IK target in metres relative to the hip")
     args = parser.parse_args()
+    if args.target and (args.check or args.video):
+        parser.error("--target cannot be combined with --check or --video")
     if args.check:
         check()
     elif args.video:
         render_video(args.video)
+    elif args.target:
+        target_viewer(*args.target)
     else:
         viewer()
 
